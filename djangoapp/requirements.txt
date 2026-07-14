@@ -1,2 +1,2 @@
-Django>=6.0.7<6.1
-psycopg2-binary>=2.9.12<2.10s
+Django>=6.0.7,<6.1
+psycopg2-binary>=2.9.12,<2.10

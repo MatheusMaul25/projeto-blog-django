@@ -1,5 +1,5 @@
-FROM python:3.14.6-alpine3.24
-LABEL manteiner= "matheusmaul64@gmail.com"
+FROM python:3.13.14-alpine3.24
+LABEL mainteiner="matheusmaul64@gmail.com"
 
 # Essa variável de ambiente é usada para controlar se o Python deve 
 # gravar arquivos de bytecode (.pyc) no disco. 1 = Não, 0 = Sim
@@ -24,7 +24,7 @@ EXPOSE 8000
 # RUN executa comandos em um shell dentro do container para construir a imagem. 
 # O resultado da execução do comando é armazenado no sistema de arquivos da 
 # imagem como uma nova camada.
-# Agrupar os comandos em um único RUN pode reduzir a quantidade de camadas da 
+# Agrupar os comandos em um único RUN pode reduzir a quantidade de #camadas da 
 # imagem e torná-la mais eficiente.
 RUN python -m venv /venv && \
   /venv/bin/pip install --upgrade pip && \
