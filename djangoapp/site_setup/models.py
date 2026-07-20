@@ -1,4 +1,6 @@
 from django.db import models
+from utils.models_validators import validate_png
+from utils.images import resize_images
 
 class MenuLink(models.Model):
     class Meta:
@@ -27,3 +29,22 @@ class SiteSetup(models.Model):
     show_description = models.BooleanField(default= True)
     show_pagination = models.BooleanField(default= True)
     show_footer = models.BooleanField(default= True)
+    favicon = models.ImageField(
+        upload_to= 'assets/favicon/%Y/%m', 
+        blank= True,
+        default= '',
+        validators=[validate_png])
+    
+    def save(self, *args, **kwargs):
+        current_favicon_name = str(self.favicon.name)
+        super().save(*args, **kwargs)
+        changed_favicon = False
+
+        if self.favicon:
+            changed_favicon = current_favicon_name != self.favicon.name
+
+        if changed_favicon:
+            resize_images(self.favicon, 32)
+
+    def __str__(self):
+        return self.title
