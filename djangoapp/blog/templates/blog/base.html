@@ -4,10 +4,16 @@
 {% include "blog/partials/_head.html" %}
 </head>
 <body>
+    {% if site_setup.show_header %}
     {% include "blog/partials/_header.html" %} 
+    {% else %}
+    {% include "blog/partials/_no-header.html" %}
+    {% endif %}
     {% block content %} {% endblock content %}
     {% include "blog/partials/_pagination.html" %}
+    {% if site_setup.show_footer %}
     {% include "blog/partials/_footer.html" %}
+    {% endif %}
 
 </body>
 </html>
