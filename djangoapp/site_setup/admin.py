@@ -18,3 +18,5 @@ class SiteSetupAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return not SiteSetup.objects.all().exists()
+    
+

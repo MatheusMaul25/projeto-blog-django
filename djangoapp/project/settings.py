@@ -11,11 +11,14 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR.parent / 'data' / 'web'
 
+# DOTENV
+load_dotenv(BASE_DIR.parent / 'dotenv_files' / '.env', override= True)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
@@ -41,6 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blog',
     'site_setup',
+    'django_summernote',
+    # Axes app can be in any position in the INSTALLED_APPS list.
+    'axes',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +57,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # AxesMiddleware should be the last middleware in the MIDDLEWARE list.
+    # It only formats user lockout messages and renders Axes lockout responses
+    # on failed user authentication attempts from login views.
+    # If you do not want Axes to override the authentication response
+    # you can skip installing the middleware and use your own views.
+    # AxesMiddleware runs during the reponse phase. It does not conflict
+    # with middleware that runs in the request phase like
+    # django.middleware.cache.FetchFromCacheMiddleware.
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'project.urls'
@@ -107,6 +122,41 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+#CONFIGURAÇÃO DO AXES
+AUTHENTICATION_BACKENDS = [
+    # AxesStandaloneBackend should be the first backend in the AUTHENTICATION_BACKENDS list.
+    'axes.backends.AxesStandaloneBackend',
+
+    # Django ModelBackend is the default authentication backend.
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+SUMMERNOTE_CONFIG = {
+    'summernote': {
+        # Toolbar customization
+        # https://summernote.org/deep-dive/#custom-toolbar-popover
+        'toolbar': [
+            ['style', ['style', ]],
+            ['font', ['bold', 'italic', 'clear']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph', 'hr', ]],
+            ['table', ['table']],
+            ['insert', ['link', 'picture']],
+            ['view', ['fullscreen', 'codeview', 'undo', 'redo']],
+        ],
+        'codemirror': {
+            'mode': 'htmlmixed',
+            'lineNumbers': 'true',
+            'lineWrapping': 'true',
+            'theme': 'dracula',
+        },
+    },
+    'css': (
+        '//cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/theme/dracula.min.css',
+    ),
+    'attachment_filesize_limit': 30 * 1024 * 1024,
+    'attachment_model': 'blog.PostAttachment',
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
@@ -127,3 +177,9 @@ STATIC_URL = '/static/'
 STATIC_ROOT = DATA_DIR / 'static'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = DATA_DIR / 'media'
+
+# CONFIGURAÇÕES DO AXES
+AXES_ENABLED = True # Ativa o axes
+AXES_FAILURE_LIMIT = 6 # Define o limite de erros de senha ou login
+AXES_COOLOF_TIME = 1 # Se errar 6 vezes a senha fica bloqueado por 1 hora
+AXES_RESET_ON_SUCCESS = True # Reseta o contador de erros caso a pessoa consiga fazer o login
